@@ -3,5 +3,5 @@
 Project: Software Development &amp; Informational Systems 
 
  - ATHANASOPOYLOS
- - GIANNELIS
+ - SAKKAS 
  - NIKA
