@@ -2,7 +2,9 @@
 ## kati
 Project: Software Development &amp; Informational Systems 
 
- - ATHANASOPOYLOS
- - NIKA 
- - SAKKAS
+ - ATHANASOPOYLOS ALEKSANDROS
+ - NIKA KONSTANTINA
+ - SAKKAS NIKITAS
+
+
  
