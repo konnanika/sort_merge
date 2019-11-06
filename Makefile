@@ -1,7 +1,9 @@
 OBJS 		= smj.o parcer.o helpers.o unsorted.o sorted.o merged.o
 OUT  		= smj
 CC   		= gcc
+ARGS		= -1 smarelA -2 smarelB
 
+# Compile smj and create executable
 all: $(OBJS)
 	$(CC) -g $? -o $(OUT)
 	rm -f $(OBJS)
@@ -28,10 +30,10 @@ merged.o: merged.c
 	$(CC) -g -c $?
 
 # Run the executable produced
-#run: $(OUT)
-#	./$(OUT) ${ARGS}
+run :
+	@$(MAKE) && ./$(OUT) $(ARGS)
 
-# Do some housekeeping
+# Clear everything
 clean:	
 	rm -f $(OBJS) $(OUT)
 	clear
