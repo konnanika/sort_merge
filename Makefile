@@ -1,4 +1,4 @@
-OBJS 		= smj.o parcer.o helpers.o unsorted.o sorted.o merged.o
+OBJS 		= smj.o parser.o helpers.o unsorted.o sorted.o merged.o
 OUT  		= smj
 CC   		= gcc
 ARGS		= -1 smarelA -2 smarelB
@@ -11,7 +11,7 @@ all: $(OBJS)
 smj.o: smj.c
 	$(CC) -g -c $?
 
-parcer.o: parcer.c
+parser.o: parser.c
 	$(CC) -g -c $?
 
 helpers.o: helpers.c

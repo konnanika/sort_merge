@@ -8,7 +8,7 @@
 #include <string.h>
 
 #include "consts.h"
-#include "parcer.h"
+#include "parser.h"
 #include "merged.h"
 
 #endif
