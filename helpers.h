@@ -2,15 +2,13 @@
 #define _HELPERS_H_
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
 #include <inttypes.h>
 
-#include "consts.h"
-#include "structs.h"
-#include "helpers.h"
-
-uint64_t S64(const char *s);
+/*
+ * Convert a string to uint64_t
+ * @param String with the number
+ * RETURNS the number written in the string
+ */
+uint64_t atouint64_t (const char *s);
 
 #endif

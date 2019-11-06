@@ -1,6 +1,6 @@
 #include "parcer.h"
-
-void parse_input_file(tables *official_tables, char input_file_name_1[FILENAME_MAX_LENGTH],	char input_file_name_2[FILENAME_MAX_LENGTH]) {
+// Parse 2 files and fill 2 unsorted tables
+void parse_input_file(unsorted_tables *unsorted_tables, char input_file_name_1[FILENAME_MAX_LENGTH],	char input_file_name_2[FILENAME_MAX_LENGTH]) {
 // Variables
 	FILE *file;
 	char *line = NULL;
@@ -18,10 +18,10 @@ void parse_input_file(tables *official_tables, char input_file_name_1[FILENAME_M
 	while ((read = getline(&line, &len, file)) != -1) {
         line[strlen(line)-1] = '\0';
         token = strtok(line,comma);
-        official_tables->table_1[record_counter].key = S64(token);
+        unsorted_tables->table_1[record_counter].key = atouint64_t(token);
         token = strtok(NULL, comma);
-        official_tables->table_1[record_counter].payload = S64(token);
-        official_tables->table_1[record_counter].rowID = -1;
+        unsorted_tables->table_1[record_counter].payload = atouint64_t(token);
+        unsorted_tables->table_1[record_counter].rowID = record_counter;
         record_counter++;
     }
     fclose(file);
@@ -35,10 +35,10 @@ void parse_input_file(tables *official_tables, char input_file_name_1[FILENAME_M
 	while ((read = getline(&line, &len, file)) != -1) {
         line[strlen(line)-1] = '\0';
         token = strtok(line,comma);
-        official_tables->table_2[record_counter].key = S64(token);
+        unsorted_tables->table_2[record_counter].key = atouint64_t(token);
         token = strtok(NULL, comma);
-        official_tables->table_2[record_counter].payload = S64(token);
-        official_tables->table_2[record_counter].rowID = -1;
+        unsorted_tables->table_2[record_counter].payload = atouint64_t(token);
+        unsorted_tables->table_2[record_counter].rowID = record_counter;
         record_counter++;
     }
     fclose(file);

@@ -7,8 +7,8 @@
 #include <inttypes.h>
 #include <string.h>
 
-#include "structs.h"
 #include "consts.h"
 #include "parcer.h"
+#include "merged.h"
 
 #endif

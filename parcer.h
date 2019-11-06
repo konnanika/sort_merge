@@ -8,15 +8,15 @@
 #include <inttypes.h>
 
 #include "consts.h"
-#include "structs.h"
+#include "unsorted.h"
 #include "helpers.h"
 
-/**
- * Parse an entire graph from the stream pointed to by file
- * @param The struct where the tables will be stored
+/*
+ * Parse 2 files and fill 2 unsorted tables
+ * @param Pointer to the struct of the 2 unsorted tables
  * @param The name of the first file
  * @param The name of the second file
  */
-void parse_input_file(tables *official_tables, char input_file_name_1[FILENAME_MAX_LENGTH],	char input_file_name_2[FILENAME_MAX_LENGTH]);
+void parse_input_file(unsorted_tables *unsorted_tables, char input_file_name_1[FILENAME_MAX_LENGTH], char input_file_name_2[FILENAME_MAX_LENGTH]);
 
 #endif
