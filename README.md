@@ -1,10 +1,7 @@
 # DEPARTMENT OF INFORMATICS & TELECOMMUNICATIONS of NATIONAL AND KAPODISTRIAN UNIVERSITY OF ATHENS 
 ## SORT MERGE JOIN
-Project: Software Development &amp; Informational Systems 
+######Project: Software Development &amp; Informational Systems 
 
- - ATHANASOPOYLOS ALEKSANDROS
- - NIKA KONSTANTINA
- - SAKKAS NIKITAS
-
-
- 
+ - Athanasopoulos Aleksandros
+ - Nika Konstantina
+ - Sakkas Nikitas
