@@ -1,0 +1,76 @@
+#ifndef _STRUCTS_H_
+#define _STRUCTS_H_
+
+typedef struct row {
+	uint64_t *value;
+} row;
+
+typedef struct table {
+	uint64_t lines;
+	uint64_t columns;
+	row **rows;
+} table;
+
+typedef struct database {
+	table **tables;
+} database;
+
+typedef struct unsorted_record {
+	int rowID;
+	int key;
+	unsigned char bin[8];
+} unsorted_record;
+
+typedef struct unsorted_tables {
+	unsorted_record *table_1;
+	unsorted_record *table_2;
+} unsorted_tables;
+
+typedef struct sorted_record {
+	int rowID;
+	int key;
+} sorted_record;
+
+typedef struct sorted_tables {
+	sorted_record *table_1;
+	sorted_record *table_2;
+} sorted_tables;
+
+typedef struct merged_record {
+	int rowID_1;
+	int key_1;
+	int rowID_2;
+	int key_2;
+} merged_record;
+
+typedef struct smj {
+	int table_1;
+	int key_1;
+	int table_2;
+	int key_2;
+} smj;
+
+typedef struct filter {
+	int table;
+	int key;
+	char symbol;
+	uint64_t number;
+} filter;
+
+typedef struct sum {
+	int
+} sum;
+
+typedef struct query {
+	int null;
+	table *result;
+	int *involved_tables;
+	int num_of_smjs;
+	int num_of_filters;
+	int num_of_sums;
+	smj *predicates_smj;
+	filter *predicates_filter;
+	sum *result_sum;
+} query;
+
+#endif

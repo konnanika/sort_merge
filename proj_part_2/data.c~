@@ -1,0 +1,9 @@
+#include "data.h"
+
+database *create_database (int total_tables) {
+	int i = 0;
+	database *database = malloc(sizeof(struct database));
+	for(i=0; i<total_tables; i++)
+		database[i]
+
+}

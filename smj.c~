@@ -35,27 +35,27 @@ int main(int argc, char **argv) {
 	printf("*****	Opening input files	*****\n");
 	parse_input_file(Unsorted_tables, input_file_name_1, input_file_name_2);
 	printf("*****	Closing input files	*****\n");
-	printf("*****	Unsorted table 1	*****\n");
-	print_unsorted_table (Unsorted_tables->table_1, NUM_OF_LINES_IN_FILE_1);
-	printf("*****	Unsorted table 2	*****\n");
-	print_unsorted_table (Unsorted_tables->table_2, NUM_OF_LINES_IN_FILE_2);
+//	printf("*****	Unsorted table 1	*****\n");
+//	print_unsorted_table (Unsorted_tables->table_1, NUM_OF_LINES_IN_FILE_1);
+//	printf("*****	Unsorted table 2	*****\n");
+//	print_unsorted_table (Unsorted_tables->table_2, NUM_OF_LINES_IN_FILE_2);
 // Creating binary tables
 	printf("*****	Creating bin tables	*****\n");
 	fill_bin_table(Unsorted_tables);
 // Sorting tables
 	printf("*****	Sorting table 1 	*****\n");
 	sort (Unsorted_tables->table_1, Sorted_tables->table_1, 0, NUM_OF_LINES_IN_FILE_1, 7);
-	printf("*****	Sorted table 1		*****\n");
-	print_sorted_table (Sorted_tables->table_1, NUM_OF_LINES_IN_FILE_1);
+//	printf("*****	Sorted table 1		*****\n");
+//	print_sorted_table (Sorted_tables->table_1, NUM_OF_LINES_IN_FILE_1);
 	printf("*****	Sorting table 2 	*****\n");
 	sort (Unsorted_tables->table_2, Sorted_tables->table_2, 0, NUM_OF_LINES_IN_FILE_2, 7);
-	printf("*****	Sorted table 2		*****\n");
-	print_sorted_table (Sorted_tables->table_2, NUM_OF_LINES_IN_FILE_2);
+//	printf("*****	Sorted table 2		*****\n");
+//	print_sorted_table (Sorted_tables->table_2, NUM_OF_LINES_IN_FILE_2);
 // Merging tables
 	printf("*****	Merging tables		*****\n");
 	merge (root, Sorted_tables, Unsorted_tables);
-	printf("*****	Merged table		*****\n");
-	print_merged_table (root); 
+//	printf("*****	Merged table		*****\n");
+//	print_merged_table (root); 
 // Deleting everything - Shutdown
 	printf("*****	Shuting Down smj	*****\n");
 	destroy_buffers (root);
