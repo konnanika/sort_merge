@@ -9,6 +9,7 @@ int main(int argc, char **argv) {
 	query **queries;
 // Reading the input filenames
 	input_menu(files);
+	database->tables = malloc(files->total_tables * sizeof(struct table));
 // Reading the binary files
 	read_binary_files (files, database);
 // Reading the queries

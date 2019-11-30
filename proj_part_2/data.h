@@ -15,11 +15,11 @@ typedef struct row {
 typedef struct table {
 	uint64_t lines;
 	uint64_t columns;
-	row **rows;
+	row *rows;
 } table;
 
 typedef struct database {
-	table **tables;
+	table *tables;
 } database;
 
 #endif
