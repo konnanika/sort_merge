@@ -11,6 +11,10 @@
 #define MAX_NUM_FOR_QUICKSORT						8192			// Number of records in a table to quicksort
 #define SIZE_OF_THE_BUFFER							41666			// NUmber of records in a buffer of 1MB
 #define MAX_NUM_OF_INPUT_FILES						100
+#define MAX_NUM_OF_QUERIES							100
+#define MAX_NUM_OF_FILTERS							100
+#define MAX_NUM_OF_SMJS								100
+#define MAX_NUM_OF_SUMS								100
 #define STRING_LENGTH								100
 
 #define tesrelA										3				// Number of lines in first unit test file

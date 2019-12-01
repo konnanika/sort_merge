@@ -19,6 +19,5 @@ void read_binary_files (input *files, database *database) {
 			}
 		}
 		fclose(file);
-		printf("\nskata\n");
 	}
 }
