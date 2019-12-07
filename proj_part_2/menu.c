@@ -88,17 +88,44 @@ void queries_menu (query queries[MAX_NUM_OF_QUERIES]) {
 				ampersands++;
 		}
 		token = strtok(predicates, ampersand);
-		for (i=0; token[i]!='\0'; i++) {
-			if (token[i] == dot[0])
-				dots++;
+		//konnan
+		for (i=1; i<=ampersands; i++){
+			//konna
+
+			for (i=0; token[i]!='\0'; i++) {
+				if (token[i] == dot[0])
+					dots++;
+			}
+			if (dots == 1) {
+				temp = strtok(token, dot);
+				queries[q].predicates_filter[queries[q].num_of_filters].table = atoi(temp);
+	//			temp = strtok(NULL, );
+	//			queries[q].predicates_filter[queries[q].num_of_filters].table = atoi(temp);
+				queries[q].num_of_filters++;
+			}
+			else if(dots == 2){
+				//konnan
+				temp = strtok(token, dot);
+				queries[q].predicates_smj[queries[q].num_of_smjs].table = atoi(temp);
+				queries[q].num_of_smjs++;
+			}
+			//konnan
+			token = strtok(NULL, ampersand);
 		}
-		if (dots == 1) {
-			temp = strtok(token, dot);
-			queries[q].predicates_filter[queries[q].num_of_filters].table = atoi(temp);
-//			temp = strtok(NULL, );
-//			queries[q].predicates_filter[queries[q].num_of_filters].table = atoi(temp);
-			queries[q].num_of_filters++;
+	// Reading sums
+		for (i=0; sums[i]!='\0'; i++) {
+			if (sums[i] == space[0])
+				spaces++;
 		}
+		token = strtok(sums, space);
+		queries[q].result_sum[queries[q].num_of_sums].table = atoi(token);
+		for (i=1; i<=spaces; i++) {
+			token = strtok(NULL, space);
+			queries[q].result_sum[queries[q].num_of_sums].table = atoi(token);
+			queries[q].num_of_sums++;
+		}
+		spaces = 0;	
+		//konnan
 		q++;
 		free(string);
 	}

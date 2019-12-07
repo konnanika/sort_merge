@@ -116,7 +116,7 @@ void quicksort (unsorted_record *unsorted_table, int first, int last) {
 		quicksort(unsorted_table,j+1,last);
 	}
 }
-// Print an unsorted table
+// Print an sorted table
 void print_sorted_table (sorted_record *table, int records) {
 	int i = 0;
 	printf("\n*************************************************************************\n");
