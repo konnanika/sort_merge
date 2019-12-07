@@ -88,28 +88,55 @@ void queries_menu (query queries[MAX_NUM_OF_QUERIES]) {
 				ampersands++;
 		}
 		token = strtok(predicates, ampersand);
-		//konnan
+		//Looping for all ampersands plus one
 		for (i=1; i<=ampersands; i++){
-			//konna
-
+			//Find all the dots to seperate the filters and smjs
 			for (i=0; token[i]!='\0'; i++) {
 				if (token[i] == dot[0])
 					dots++;
+<<<<<<< HEAD
 			}   
+=======
+			}
+			// When dots = 1 then is filter
+>>>>>>> 4fcb52a3d767e8a414d9ab7dd5339ade3ccfdceb
 			if (dots == 1) {
 				temp = strtok(token, dot);
 				queries[q].predicates_filter[queries[q].num_of_filters].table = atoi(temp);
-	//			temp = strtok(NULL, );
-	//			queries[q].predicates_filter[queries[q].num_of_filters].table = atoi(temp);
+				//If the symbol is the greater or the lower
+				for (i=0; token[i]!='\0'; i++) {
+					if (token[i] == greater[0]){
+						temp = strtok(NULL, greater);
+						queries[q].predicates_filter[queries[q].num_of_filters].sympol = greater[0];
+					}
+					else if (token[i] == lower[0]){
+						temp = strtok(NULL, lower);
+						queries[q].predicates_filter[queries[q].num_of_filters].sympol = lower[0];
+					}
+				}
+				queries[q].predicates_filter[queries[q].num_of_filters].key = atoi(temp);
+				temp = strtok(NULL,ampersand);
+				queries[q].predicates_filter[queries[q].num_of_filters].number = atoi(temp);
 				queries[q].num_of_filters++;
 			}
+			// When dots = 2 then is smj
 			else if(dots == 2){
-				//konnan
+				//Take the first table with the key (for joing with the second)
 				temp = strtok(token, dot);
 				queries[q].predicates_smj[queries[q].num_of_smjs].table_1 = atoi(temp);
+<<<<<<< HEAD
+=======
+				temp = strtok(NULL, equal);
+				queries[q].predicates_smj[queries[q].num_of_smjs].key_1 = atoi(temp);
+				//Take the second table with the key
+				temp = strtok(NULL, dot);
+				queries[q].predicates_smj[queries[q].num_of_smjs].table_2 = atoi(temp);
+				temp = strtok(NULL, ampersand);
+				queries[q].predicates_smj[queries[q].num_of_smjs].key_2 = atoi(temp);
+
+>>>>>>> 4fcb52a3d767e8a414d9ab7dd5339ade3ccfdceb
 				queries[q].num_of_smjs++;
 			}
-			//konnan
 			token = strtok(NULL, ampersand);
 		}
 	// Reading sums
@@ -118,14 +145,17 @@ void queries_menu (query queries[MAX_NUM_OF_QUERIES]) {
 				spaces++;
 		}
 		token = strtok(sums, space);
-		queries[q].result_sum[queries[q].num_of_sums].table = atoi(token);
+		// Looping until find all the sums for spaces plus one
 		for (i=1; i<=spaces; i++) {
-			token = strtok(NULL, space);
-			queries[q].result_sum[queries[q].num_of_sums].table = atoi(token);
+			temp = strtok(token,dot);
+			queries[q].result_sum[queries[q].num_of_sums].table = atoi(temp);
+			temp = strtok(NULL,dot);
+			queries[q].result_sum[queries[q].num_of_sums].key = atoi(temp);
+
 			queries[q].num_of_sums++;
-		}
+			token = strtok(NULL, space);
+		}	
 		spaces = 0;	
-		//konnan
 		q++;
 		free(string);
 	}
