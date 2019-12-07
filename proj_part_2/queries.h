@@ -43,4 +43,6 @@ typedef struct query {
 
 void init_query (query query);
 
+void queries_execution (query queries[MAX_NUM_OF_QUERIES], database *database);
+
 #endif

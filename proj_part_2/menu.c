@@ -95,7 +95,7 @@ void queries_menu (query queries[MAX_NUM_OF_QUERIES]) {
 			for (i=0; token[i]!='\0'; i++) {
 				if (token[i] == dot[0])
 					dots++;
-			}
+			}   
 			if (dots == 1) {
 				temp = strtok(token, dot);
 				queries[q].predicates_filter[queries[q].num_of_filters].table = atoi(temp);
@@ -106,7 +106,7 @@ void queries_menu (query queries[MAX_NUM_OF_QUERIES]) {
 			else if(dots == 2){
 				//konnan
 				temp = strtok(token, dot);
-				queries[q].predicates_smj[queries[q].num_of_smjs].table = atoi(temp);
+				queries[q].predicates_smj[queries[q].num_of_smjs].table_1 = atoi(temp);
 				queries[q].num_of_smjs++;
 			}
 			//konnan
