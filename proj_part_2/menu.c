@@ -98,11 +98,15 @@ void queries_menu (query queries[MAX_NUM_OF_QUERIES]) {
 			for (i=0; token[i]!='\0'; i++) {
 				if (token[i] == dot[0])
 					dots++;
+<<<<<<< HEAD
+			}   
+=======
 			}
 			printf("dots = %d in epanalipsi = %d\n",dots, j);
 			temp = malloc(sizeof(*token));
 			strcpy(temp,token);
 			// When dots = 1 then is filter
+>>>>>>> 4fcb52a3d767e8a414d9ab7dd5339ade3ccfdceb
 			if (dots == 1) {
 				temp = strtok(temp, dot);
 				queries[q].predicates_filter[queries[q].num_of_filters].table = atoi(temp);
@@ -131,6 +135,8 @@ void queries_menu (query queries[MAX_NUM_OF_QUERIES]) {
 				//Take the first table with the key (for joing with the second)
 				temp = strtok(temp, dot);
 				queries[q].predicates_smj[queries[q].num_of_smjs].table_1 = atoi(temp);
+<<<<<<< HEAD
+=======
 				temp = strtok(NULL, equal);
 				queries[q].predicates_smj[queries[q].num_of_smjs].key_1 = atoi(temp);
 				//Take the second table with the key
@@ -138,6 +144,11 @@ void queries_menu (query queries[MAX_NUM_OF_QUERIES]) {
 				queries[q].predicates_smj[queries[q].num_of_smjs].table_2 = atoi(temp);
 				temp = strtok(NULL, dot);
 				queries[q].predicates_smj[queries[q].num_of_smjs].key_2 = atoi(temp);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4fcb52a3d767e8a414d9ab7dd5339ade3ccfdceb
+>>>>>>> 5a758856bec12dd0fee8ce538d1448a98f0d1c9b
 				queries[q].num_of_smjs++;
 			}
 			printf("num_of_filters = %d\n",queries[q].num_of_filters);
