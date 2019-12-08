@@ -1,12 +1,12 @@
 #include "queries.h"
 
-void init_query (query query) {
-	query.num_of_smjs = 0;
-	query.num_of_filters = 0;
-	query.num_of_sums = 0;
+void init_query (query *query) {
+	query->num_of_smjs = 0;
+	query->num_of_filters = 0;
+	query->num_of_sums = 0;
 }
 
-void queries_execution (query queries[MAX_NUM_OF_QUERIES], database *database) {
+void queries_execution (query *queries, database *database) {
 // Random Variables
 	int i = 0;
 	uint64_t j = 0;

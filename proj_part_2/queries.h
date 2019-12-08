@@ -36,13 +36,13 @@ typedef struct query {
 	int num_of_smjs;
 	int num_of_filters;
 	int num_of_sums;
-	smj predicates_smj[MAX_NUM_OF_SMJS];
-	filter predicates_filter[MAX_NUM_OF_FILTERS];
-	sum result_sum[MAX_NUM_OF_SUMS];
+	smj *predicates_smj;
+	filter *predicates_filter;
+	sum *result_sum;
 } query;
 
-void init_query (query query);
+void init_query (query *query);
 
-void queries_execution (query queries[MAX_NUM_OF_QUERIES], database *database);
+void queries_execution (query *queries, database *database);
 
 #endif

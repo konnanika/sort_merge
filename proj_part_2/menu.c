@@ -26,16 +26,20 @@ void input_menu (input *files) {
 	}
 }
 
-void queries_menu (query queries[MAX_NUM_OF_QUERIES]) {
+void queries_menu (query *queries) {
 // Variables
 	int i = 0;
 	int j = 0;
 	int q = 0;
+	int stop = 0;
+	int chars = 0;
 	char *string;
-	char *token = '\0';
-	char *temp;
+	char *token;
+	char *token1;
+	char temp[STRING_LENGTH];
 	char tables[STRING_LENGTH];
 	char predicates[STRING_LENGTH];
+	char official_predicates[STRING_LENGTH];
 	char sums[STRING_LENGTH];
 	size_t stringsize = 32;
 	size_t characters;
@@ -56,13 +60,16 @@ void queries_menu (query queries[MAX_NUM_OF_QUERIES]) {
 	while(1) {
 		string = (char *)malloc(stringsize * sizeof(char));
 		printf("	-->	");
+		queries[q].predicates_filter = malloc(MAX_NUM_OF_FILTERS * (sizeof(struct filter)));
+		queries[q].predicates_smj = malloc(MAX_NUM_OF_SMJS * sizeof(struct smj));
+		queries[q].result_sum = malloc(MAX_NUM_OF_SUMS * sizeof(struct sum));
 	// Reading the query
 		characters = getline(&string, &stringsize, stdin);
 		if (string[0] == 'F') {
 			free(string);
 			break;
 		}
-		init_query(queries[q]);
+		init_query(&queries[q]);
 	// Cutting the string of the query in 3 substrings
 		token = strtok(string, pipe);
 		strcpy(tables, token);
@@ -84,102 +91,101 @@ void queries_menu (query queries[MAX_NUM_OF_QUERIES]) {
 		}
 		spaces = 0;
 	// Reading predicates
-		for (i=0; predicates[i]!='\0'; i++) {
-			if (predicates[i] == ampersand[0])
-				ampersands++;
-		}
-		token = strtok(predicates, ampersand);
-		//Looping for all ampersands plus one
-		for (j=1; j<=ampersands; j++){
-			printf("exoyme epanalipsis = %d\n",j);
-			printf("ampersands = %d\n",ampersands);
-			printf("token = %s in %d\n",token,j);
-			//Find all the dots to seperate the filters and smjs
-			for (i=0; token[i]!='\0'; i++) {
-				if (token[i] == dot[0])
+		strcpy(official_predicates, predicates);
+		while(token) {
+			strcpy(predicates, official_predicates);
+			for (i=0; official_predicates[i]!='\0'; i++) {
+				if (official_predicates[i] == dot[0])
 					dots++;
-<<<<<<< HEAD
-			}   
-=======
+				if (official_predicates[i] == ampersand[0])
+					break;
 			}
-			printf("dots = %d in epanalipsi = %d\n",dots, j);
-			temp = malloc(sizeof(*token));
-			strcpy(temp,token);
-			// When dots = 1 then is filter
->>>>>>> 4fcb52a3d767e8a414d9ab7dd5339ade3ccfdceb
 			if (dots == 1) {
-				temp = strtok(temp, dot);
-				queries[q].predicates_filter[queries[q].num_of_filters].table = atoi(temp);
-				//If the symbol is the greater or the lower
-				for (i=0; token[i]!='\0'; i++) {
-					if (token[i] == greater[0]){
-						temp = strtok(NULL, greater);
+				token = strtok(predicates, dot);
+				printf("\n\nPrinting123456789\n\n");
+				queries[q].predicates_filter[queries[q].num_of_filters].table = 0;
+				printf("\n\nPrinting123456789\n\n");
+				queries[q].predicates_filter[queries[q].num_of_filters].table = atoi(token);
+				for (i=0; official_predicates[i]!='\0'; i++) {
+					if (official_predicates[i] == greater[0]){
+						token = strtok(NULL, greater);
 						queries[q].predicates_filter[queries[q].num_of_filters].symbol = greater[0];
+						break;
 					}
-					else if (token[i] == lower[0]){
-						temp = strtok(NULL, lower);
+					else if (official_predicates[i] == lower[0]){
+						token = strtok(NULL, lower);
 						queries[q].predicates_filter[queries[q].num_of_filters].symbol = lower[0];
+						break;
 					}
-					else if (token[i] == equal[0]){
-						temp = strtok(NULL, equal);
+					else if (official_predicates[i] == equal[0]){
+						token = strtok(NULL, equal);
 						queries[q].predicates_filter[queries[q].num_of_filters].symbol = equal[0];
+						break;
 					}
 				}
-				queries[q].predicates_filter[queries[q].num_of_filters].key = atoi(temp);
-				temp = strtok(NULL,dot);
-				queries[q].predicates_filter[queries[q].num_of_filters].number = atoi(temp);
+				queries[q].predicates_filter[queries[q].num_of_filters].key = atoi(token);
+				token = strtok(NULL,ampersand);
+				queries[q].predicates_filter[queries[q].num_of_filters].number = atoi(token);
 				queries[q].num_of_filters++;
-			}
-			// When dots = 2 then is smj
-			else if(dots == 2){
-				//Take the first table with the key (for joing with the second)
-				temp = strtok(temp, dot);
-				queries[q].predicates_smj[queries[q].num_of_smjs].table_1 = atoi(temp);
-<<<<<<< HEAD
-=======
-				temp = strtok(NULL, equal);
-				queries[q].predicates_smj[queries[q].num_of_smjs].key_1 = atoi(temp);
-				//Take the second table with the key
-				temp = strtok(NULL, dot);
-				queries[q].predicates_smj[queries[q].num_of_smjs].table_2 = atoi(temp);
-				temp = strtok(NULL, dot);
-				queries[q].predicates_smj[queries[q].num_of_smjs].key_2 = atoi(temp);
-<<<<<<< HEAD
-=======
-
->>>>>>> 4fcb52a3d767e8a414d9ab7dd5339ade3ccfdceb
->>>>>>> 5a758856bec12dd0fee8ce538d1448a98f0d1c9b
+			} else if (dots == 2) {
+				token = strtok(predicates, dot);
+				queries[q].predicates_smj[queries[q].num_of_smjs].table_1 = atoi(token);
+				token = strtok(NULL, equal);
+				queries[q].predicates_smj[queries[q].num_of_smjs].key_1 = atoi(token);
+				token = strtok(NULL, dot);
+				queries[q].predicates_smj[queries[q].num_of_smjs].table_2 = atoi(token);
+				token = strtok(NULL, dot);
+				queries[q].predicates_smj[queries[q].num_of_smjs].key_2 = atoi(token);
 				queries[q].num_of_smjs++;
 			}
-			printf("num_of_filters = %d\n",queries[q].num_of_filters);
-			printf("num_of_smjs = %d\n",queries[q].num_of_smjs);
-			token = strtok(NULL, ampersand);
+			chars=0;
+			for (i=0; official_predicates[i]!='\0'; i++) {
+				if (official_predicates[i] == ampersand[0]) {
+					stop = 1;
+					break;
+				}
+				chars++;
+			}
+			if (stop == 0)
+				break;
+			else if (stop == 1)
+				stop = 0;
+			chars++;
+			j = 0;
+			for(i=chars; official_predicates[i]!='\0'; i++) {
+				official_predicates[j] = official_predicates[i];
+				j++;
+			}
+			official_predicates[j] = '\0';
 			dots = 0;
 		}
-	// Reading sums
-		for (i=0; sums[i]!='\0'; i++) {
-			if (sums[i] == space[0])
-				spaces++;
+		spaces = 0;
+		printf("\nPrinting\n");
+		for (i=0; i<queries[q].num_of_smjs; i++){
+			printf("\nThe joins that we need to do are: \n");
+			printf("%d", queries[q].predicates_smj[i].table_1);
+			printf(".%d=", queries[q].predicates_smj[i].key_1);
+			printf("%d", queries[q].predicates_smj[i].table_2);	
+			printf("%d\n", queries[q].predicates_smj[i].key_2);
 		}
-		token = strtok(sums, space);
-		// Looping until find all the sums for spaces plus one
-		for (i=1; i<=spaces; i++) {
-			temp = strtok(token,dot);
-			queries[q].result_sum[queries[q].num_of_sums].table = atoi(temp);
-			temp = strtok(NULL,dot);
-			queries[q].result_sum[queries[q].num_of_sums].key = atoi(temp);
-
-			queries[q].num_of_sums++;
-			token = strtok(NULL, space);
+		for (i=0; i<queries[q].num_of_filters; i++){
+			printf("\nThe filters that we need to do are: \n");
+			printf("%d", queries[q].predicates_filter[i].table);
+			printf(".%d", queries[q].predicates_filter[i].key);
+			printf("%c", queries[q].predicates_filter[i].symbol);	
+			printf("%d\n", queries[q].predicates_filter[i].number);
 		}
-		spaces = 0;	
+/*		for (i=0; i<=queries[q].num_of_sums; i++){
+			printf("\nThe sums that we need to do are: \n");
+			printf("%d", queries[q].result_sum[queries[q].num_of_sums].table);
+			printf(".%d", queries[q].result_sum[queries[q].num_of_sums].key);
+		}	*/
 		q++;
-		free(temp);
-		//free(token);
-		free(string);
 	}
 }
 
-
+//		0 1 2 3 4|0.1>10&1.1>5&2.0>0&3.3>5|0.1
+//		0 1 2 3 4|3.1>101010&1.1=3.5&0.1>10&1.1>5&2.0>0&3.3>5&0.1=2.3&3.3>50574&3.1<5457|1.1 3.1
+//		/home/user/Desktop/qwerasdf/r0
 
 

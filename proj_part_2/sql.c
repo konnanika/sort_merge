@@ -6,7 +6,7 @@ int main(int argc, char **argv) {
 // Database Variables
 	input *files = malloc(sizeof(input));
 	database *database = malloc(sizeof(struct database));
-	query queries[MAX_NUM_OF_QUERIES];
+	query *queries = malloc(MAX_NUM_OF_QUERIES * sizeof(struct query));
 // Reading the input filenames
 	input_menu(files);
 	database->tables = malloc(files->total_tables * sizeof(struct table));

@@ -15,6 +15,6 @@ typedef struct input {
 
 void input_menu (input *files);
 
-void queries_menu (query queries[MAX_NUM_OF_QUERIES]);
+void queries_menu (query *queries);
 
 #endif
