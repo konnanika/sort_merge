@@ -15,9 +15,12 @@ int main(int argc, char **argv) {
 // Reading the queries
 	queries_menu(queries);
 // Executing the queries
-	queries_execution(queries, database);
+	//queries_execution(queries, database);
 // Shuting down
+	printf("\nskata\n");
+	free_database(database, files->total_tables);
+	printf("\nskata\n");
+	free_queries(queries);
 	free(files);
-	free(database);
 	return 0;
 }

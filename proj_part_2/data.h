@@ -22,4 +22,6 @@ typedef struct database {
 	table *tables;
 } database;
 
+void free_database (database *database, int total_tables);
+
 #endif

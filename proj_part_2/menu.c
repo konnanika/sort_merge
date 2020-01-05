@@ -60,15 +60,16 @@ void queries_menu (query *queries) {
 	while(1) {
 		string = (char *)malloc(stringsize * sizeof(char));
 		printf("	-->	");
-		queries[q].predicates_filter = malloc(MAX_NUM_OF_FILTERS * (sizeof(struct filter)));
-		queries[q].predicates_smj = malloc(MAX_NUM_OF_SMJS * sizeof(struct smj));
-		queries[q].result_sum = malloc(MAX_NUM_OF_SUMS * sizeof(struct sum));
 	// Reading the query
 		characters = getline(&string, &stringsize, stdin);
 		if (string[0] == 'F') {
+			queries[q].num_of_smjs = -1;
 			free(string);
 			break;
 		}
+		queries[q].predicates_filter = malloc(MAX_NUM_OF_FILTERS * (sizeof(struct filter)));
+		queries[q].predicates_smj = malloc(MAX_NUM_OF_SMJS * sizeof(struct smj));
+		queries[q].result_sum = malloc(MAX_NUM_OF_SUMS * sizeof(struct sum));
 		init_query(&queries[q]);
 	// Cutting the string of the query in 3 substrings
 		token = strtok(string, pipe);
@@ -102,9 +103,6 @@ void queries_menu (query *queries) {
 			}
 			if (dots == 1) {
 				token = strtok(predicates, dot);
-				printf("\n\nPrinting123456789\n\n");
-				queries[q].predicates_filter[queries[q].num_of_filters].table = 0;
-				printf("\n\nPrinting123456789\n\n");
 				queries[q].predicates_filter[queries[q].num_of_filters].table = atoi(token);
 				for (i=0; official_predicates[i]!='\0'; i++) {
 					if (official_predicates[i] == greater[0]){
@@ -160,27 +158,8 @@ void queries_menu (query *queries) {
 			dots = 0;
 		}
 		spaces = 0;
-		printf("\nPrinting\n");
-		for (i=0; i<queries[q].num_of_smjs; i++){
-			printf("\nThe joins that we need to do are: \n");
-			printf("%d", queries[q].predicates_smj[i].table_1);
-			printf(".%d=", queries[q].predicates_smj[i].key_1);
-			printf("%d", queries[q].predicates_smj[i].table_2);	
-			printf("%d\n", queries[q].predicates_smj[i].key_2);
-		}
-		for (i=0; i<queries[q].num_of_filters; i++){
-			printf("\nThe filters that we need to do are: \n");
-			printf("%d", queries[q].predicates_filter[i].table);
-			printf(".%d", queries[q].predicates_filter[i].key);
-			printf("%c", queries[q].predicates_filter[i].symbol);	
-			printf("%d\n", queries[q].predicates_filter[i].number);
-		}
-/*		for (i=0; i<=queries[q].num_of_sums; i++){
-			printf("\nThe sums that we need to do are: \n");
-			printf("%d", queries[q].result_sum[queries[q].num_of_sums].table);
-			printf(".%d", queries[q].result_sum[queries[q].num_of_sums].key);
-		}	*/
 		q++;
+		free(string);
 	}
 }
 

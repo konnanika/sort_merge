@@ -43,6 +43,7 @@ typedef struct query {
 
 void init_query (query *query);
 
-void queries_execution (query *queries, database *database);
+void free_queries (query *queries);
+//void queries_execution (query *queries, database *database);
 
 #endif
