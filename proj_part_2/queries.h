@@ -33,6 +33,7 @@ typedef struct query {
 	int null;
 	table *result;
 	int *involved_tables;
+	int num_of_tables;
 	int num_of_smjs;
 	int num_of_filters;
 	int num_of_sums;
@@ -44,6 +45,7 @@ typedef struct query {
 void init_query (query *query);
 
 void free_queries (query *queries);
-//void queries_execution (query *queries, database *database);
+
+void queries_execution (query *queries, database *database);
 
 #endif

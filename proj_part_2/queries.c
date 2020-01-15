@@ -4,6 +4,7 @@ void init_query (query *query) {
 	query->num_of_smjs = 0;
 	query->num_of_filters = 0;
 	query->num_of_sums = 0;
+	query->num_of_tables = 0;
 }
 
 void free_queries (query *queries) {
@@ -20,37 +21,108 @@ void free_queries (query *queries) {
 	free(queries);
 }
 
-
-/*
-// Fill, for each unsorted_record, a table (size of 8 bytes)
-// where each element has the unsigned value of each byte
-void fill_bin_tables (temp_database *temp_database, table *table_1, int key_1, table *table_2, int key_2) {
-// Variables
+void queries_execution (query *queries, database *database) {
+// Random Variables
 	int i = 0;
-	int j = 0;
+	int f = 0;
+	int has_filter = 0;
+	uint64_t j = 0;
+	uint64_t k = 0;
+	uint64_t p = 0;
+	uint64_t n = 0;
 	uint64_t temp = 0;
 	uint64_t compare = 255;
-// Fill bin tables in records from file 1
-	for (i=0; i<table_1->lines; i++) {
-		temp = table_1->rows[key_1].value[i];
-		temp_database
-		tables->table_1[i].bin[0] = temp & compare;
-		for (j=1; j<8; j++) {
-			temp = temp>>8;
-			tables->table_1[i].bin[j] = temp & compare;
+	int q = 0;
+// Database Variables
+	int total_tables = 0;
+	struct database *temp_database;
+	printf("starting queries");
+// For each query
+	while (queries[q].num_of_smjs != -1) {
+		total_tables = sizeof(queries[q].involved_tables) / sizeof(int);
+		temp_database = malloc(sizeof(struct database));
+		temp_database->tables = malloc(total_tables * sizeof(struct table));
+		for (j=0; j<total_tables; j++) {
+			has_filter = 0;
+			for (f=0; f<queries[q].num_of_filters; f++) {
+				if (queries[q].involved_tables[j] == queries[q].predicates_filter[f].table)
+					has_filter = 1;
+					break;
+			}
+			if (has_filter == 0) {
+				temp_database->tables[j].columns = database->tables[queries[q].involved_tables[j]].columns;
+				temp_database->tables[j].lines = database->tables[queries[q].involved_tables[j]].lines;
+				temp_database->tables[j].rows = malloc(temp_database->tables[j].columns * sizeof(struct row));
+				for (i=0; i<database->tables[queries[q].involved_tables[j]].columns; i++) {
+					temp_database->tables[j].rows[i].value = malloc(temp_database->tables[j].lines * sizeof(uint64_t));
+					for (k=0; k<database->tables[queries[q].involved_tables[j]].lines; k++) {
+						temp_database->tables[j].rows[i].value[k] = database->tables[queries[q].involved_tables[j]].rows[i].value[k];
+					}
+				}
+			} else {
+				n = 0;
+				database->tables[j].rows[queries[q].predicates_filter[f].key].need = malloc(temp_database->tables[j].lines * sizeof(uint64_t));
+				for (k=0; k<database->tables[queries[q].involved_tables[j]].lines; k++) {
+					if (queries[q].predicates_filter[f].symbol == '=') {
+						if (temp_database->tables[j].rows[queries[q].predicates_filter[f].key].value[k] == queries[q].predicates_filter[f].number) {
+							database->tables[j].rows[queries[q].predicates_filter[f].key].need[k] = 1;
+							n++;
+						} else {
+							database->tables[j].rows[queries[q].predicates_filter[f].key].need[k] = 0;
+						}
+					} else if (queries[q].predicates_filter[f].symbol == '>') {
+						if (temp_database->tables[j].rows[queries[q].predicates_filter[f].key].value[k] > queries[q].predicates_filter[f].number) {
+							database->tables[j].rows[queries[q].predicates_filter[f].key].need[k] = 1;
+							n++;
+						} else {
+							database->tables[j].rows[queries[q].predicates_filter[f].key].need[k] = 0;
+						}
+					}else if (queries[q].predicates_filter[f].symbol == '<') {
+						if (temp_database->tables[j].rows[queries[q].predicates_filter[f].key].value[k] < queries[q].predicates_filter[f].number) {
+							database->tables[j].rows[queries[q].predicates_filter[f].key].need[k] = 1;
+							n++;
+						} else {
+							database->tables[j].rows[queries[q].predicates_filter[f].key].need[k] = 0;
+						}
+					}
+				}
+				temp_database->tables[j].columns = database->tables[queries[q].involved_tables[j]].columns;
+				temp_database->tables[j].lines = n;
+				temp_database->tables[j].rows = malloc(temp_database->tables[j].columns * sizeof(struct row));
+				for (i=0; i<database->tables[queries[q].involved_tables[j]].columns; i++) {
+					temp_database->tables[j].rows[i].value = malloc(n * sizeof(uint64_t));
+					p = 0;
+					for (k=0; k<database->tables[queries[q].involved_tables[j]].lines; k++) {
+						if (database->tables[j].rows[queries[q].predicates_filter[f].key].need[k] == 1)
+							temp_database->tables[j].rows[i].value[p] = database->tables[queries[q].involved_tables[j]].rows[i].value[k];
+							p++;
+					}
+				}
+								
+			}
+			free(database->tables[j].rows[queries[q].predicates_filter[f].key].need);
 		}
-	}
-// Fill bin tables in records from file 2
-	for (i=0; i<table_2->lines; i++) {
-		temp = tables->table_2[i].key;
-		tables->table_2[i].bin[0] = temp & compare;
-		for (j=1; j<8; j++) {
-			temp = temp>>8;
-			tables->table_2[i].bin[j] = temp & compare;
-		}
+		for (i=0; i<database->tables[0].lines; i++)
+			printf("	%29" PRIu64 "\n", database->tables[0].rows[0].value[i]);
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
 /*
+
+
+
+
 void queries_execution (query *queries, database *database) {
 // Random Variables
 	int i = 0;

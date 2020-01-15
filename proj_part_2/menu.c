@@ -31,6 +31,7 @@ void queries_menu (query *queries) {
 	int i = 0;
 	int j = 0;
 	int q = 0;
+	int a = 0;
 	int stop = 0;
 	int chars = 0;
 	char *string;
@@ -84,6 +85,7 @@ void queries_menu (query *queries) {
 				spaces++;
 		}
 		queries[q].involved_tables = malloc((spaces+1) * sizeof(int));
+		queries[q].num_of_tables = spaces+1;
 		token = strtok(tables, space);
 		queries[q].involved_tables[0] = atoi(token);
 		for (i=1; i<=spaces; i++) {
@@ -93,7 +95,8 @@ void queries_menu (query *queries) {
 		spaces = 0;
 	// Reading predicates
 		strcpy(official_predicates, predicates);
-		while(token) {
+		while(official_predicates[0] != '\0') {
+			dots = 0;
 			strcpy(predicates, official_predicates);
 			for (i=0; official_predicates[i]!='\0'; i++) {
 				if (official_predicates[i] == dot[0])
@@ -157,14 +160,30 @@ void queries_menu (query *queries) {
 			official_predicates[j] = '\0';
 			dots = 0;
 		}
+	// Reading sums
+		spaces = 0;
+		dots = 0;
+		a = 0;
+		printf("\n|%s|\n", sums);
+		for (i=0; sums[i]!='\0'; i++) {
+			if (sums[i] == dot[0])
+				dots++;
+		}
+		queries[q].result_sum = malloc((dots) * sizeof(int));
+		queries[q].num_of_sums = dots;
+		for(i=0; i<dots; i++) {
+			strcpy(token, &sums[a]);
+			queries[q].result_sum[i].table = atoi(token);
+			a = a + 2;
+			strcpy(token, &sums[a]);
+			queries[q].result_sum[i].key = atoi(token);
+			a = a + 2;
+		}
+		spaces = 0;
+		token = "\n";
+		predicates[0] = '\0';
 		spaces = 0;
 		q++;
 		free(string);
 	}
 }
-
-//		0 1 2 3 4|0.1>10&1.1>5&2.0>0&3.3>5|0.1
-//		0 1 2 3 4|3.1>101010&1.1=3.5&0.1>10&1.1>5&2.0>0&3.3>5&0.1=2.3&3.3>50574&3.1<5457|1.1 3.1
-//		/home/user/Desktop/qwerasdf/r0
-
-
