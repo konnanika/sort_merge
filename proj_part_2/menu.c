@@ -164,7 +164,6 @@ void queries_menu (query *queries) {
 		spaces = 0;
 		dots = 0;
 		a = 0;
-		printf("\n|%s|\n", sums);
 		for (i=0; sums[i]!='\0'; i++) {
 			if (sums[i] == dot[0])
 				dots++;

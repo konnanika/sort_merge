@@ -8,20 +8,14 @@
 
 #include "consts.h"
 
-typedef struct bytes {
-	unsigned char byte[8];
-} bytes;
-
 typedef struct row {
 	uint64_t *value;
-	uint64_t *need;
 } row;
 
 typedef struct table {
 	uint64_t lines;
 	uint64_t columns;
 	row *rows;
-	bytes *bin;	
 } table;
 
 typedef struct database {

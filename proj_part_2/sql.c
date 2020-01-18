@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 	read_binary_files (files, database);
 // Reading the queries
 	queries_menu(queries);
-	for(q=0; q<5; q++) {
+/*	for(q=0; q<5; q++) {
 		if (queries[q].num_of_smjs == -1)
 			return 0;
 		printf("The involved tables are: \n");
@@ -41,9 +41,9 @@ int main(int argc, char **argv) {
 			printf("%d", queries[q].result_sum[i].table);
 			printf(".%d\n", queries[q].result_sum[i].key);
 		}
-	}
+	}*/
 // Executing the queries
-	printf("\nExecuting the queries\n");
+	printf("Executing the queries\n");
 	queries_execution(queries, database);
 // Shuting down
 	free_database(database, files->total_tables);
