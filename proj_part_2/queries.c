@@ -23,7 +23,7 @@ void free_queries (query *queries) {
 
 void init_unsorted_tables (unsorted_tables *unsorted_tables, database *database, query *queries, int q) {
 	int i = 0;
-	unsorted_tables->tables = malloc(queries[q].num_of_tables * sizeof(unsorted_record) * MAX_RECORDS);
+	unsorted_tables->tables = malloc(queries[q].num_of_tables * sizeof(unsorted_record));
 	for (i=0; i<queries[q].num_of_tables; i++)
 		unsorted_tables->tables[i].table = malloc(sizeof(unsorted_record) * MAX_RECORDS);
 }
@@ -128,7 +128,6 @@ void sort (unsorted_record *unsorted_table, sorted_record *sorted_table, int pos
 			sort(hist[j].temp_table, sorted_table, psum[j]+position, hist[j].value, byte-1);
 		}
 	}
-	sleep(1);
 // Destroy the histogram
 	for (j=0; j<256; j++) {
 		free(hist[j].temp_table);
@@ -180,18 +179,15 @@ void queries_execution (query *queries, database *database) {
 	int has_filter = 0;
 	uint64_t j = 0;
 	uint64_t total = 0;
+	uint64_t sum = 0;
 	uint64_t k = 0;
-	uint64_t p = 0;
 	uint64_t n = 0;
-	uint64_t temp = 0;
-	uint64_t compare = 255;
 	int q = 0;
-	int table_1 = 0;
-	int table_2 = 0;
 // Database Variables
-	merged *result = malloc(sizeof(merged));
+	merged *result;
 // For each query
 	while (queries[q].num_of_smjs != -1) {
+		result = malloc(queries[q].num_of_smjs * sizeof(merged));
 		unsorted_tables *Unsorted_tables = malloc(sizeof(unsorted_tables));
 		init_unsorted_tables (Unsorted_tables, database, queries, q);
 	// Applying Filters
@@ -227,26 +223,13 @@ void queries_execution (query *queries, database *database) {
 						}
 					}
 				}
-				Unsorted_tables->tables[j].num_of_records = n;
-				printf("%d\n",n);
 			}
 		}
-		printf("Unsorted table\n");
-		sleep(2);
-		printf("%d\n", Unsorted_tables->tables[1].table[0].rowID);
-		printf("%d\n", Unsorted_tables->tables[1].table[1].rowID);
-		printf("%d\n", Unsorted_tables->tables[1].table[2].rowID);
-		printf("%d\n", Unsorted_tables->tables[1].table[3].rowID);
-		printf("%d\n", Unsorted_tables->tables[1].table[4].rowID);
-		sleep(2);
-		print_unsorted_table (Unsorted_tables);
-		sleep(2);
 	// For each SMJ
 		for (f=0; f<queries[q].num_of_smjs; f++) {
 			sorted_tables *Sorted_tables = malloc(sizeof(sorted_tables));
 			init_sorted_tables (Sorted_tables, Unsorted_tables->tables[queries[q].predicates_smj[f].table_1].num_of_records, Unsorted_tables->tables[queries[q].predicates_smj[f].table_2].num_of_records);
 			k = 0;
-			
 			for (i=0; i<Unsorted_tables->tables[queries[q].predicates_smj[f].table_1].num_of_records; i++) {
 				Unsorted_tables->tables[queries[q].predicates_smj[f].table_1].table[i].row = queries[q].predicates_smj[f].key_1;
 				Unsorted_tables->tables[queries[q].predicates_smj[f].table_1].table[i].key = database->tables[queries[q].involved_tables[queries[q].predicates_smj[f].table_1]].rows[Unsorted_tables->tables[queries[q].predicates_smj[f].table_1].table[i].row].value[Unsorted_tables->tables[queries[q].predicates_smj[f].table_1].table[i].rowID];
@@ -258,13 +241,42 @@ void queries_execution (query *queries, database *database) {
 			fill_bin_tables (Unsorted_tables, queries[q].predicates_smj[f].table_1, queries[q].predicates_smj[f].table_2);
 			sort (Unsorted_tables->tables[queries[q].predicates_smj[f].table_1].table, Sorted_tables->table_1, 0, Unsorted_tables->tables[queries[q].predicates_smj[f].table_1].num_of_records, 7);
 			sort (Unsorted_tables->tables[queries[q].predicates_smj[f].table_2].table, Sorted_tables->table_2, 0, Unsorted_tables->tables[queries[q].predicates_smj[f].table_2].num_of_records, 7);
-			printf("\nStarting merge\n");
 			total = merge_count (Sorted_tables, Unsorted_tables->tables[queries[q].predicates_smj[f].table_1].num_of_records, Unsorted_tables->tables[queries[q].predicates_smj[f].table_2].num_of_records);
-			result->rowID_1 = malloc(total * sizeof(uint64_t));
-			result->rowID_2 = malloc(total * sizeof(uint64_t));
+			result[f].rowID_1 = malloc(total * sizeof(uint64_t));
+			result[f].rowID_2 = malloc(total * sizeof(uint64_t));
 			merge (Sorted_tables, result, Unsorted_tables->tables[queries[q].predicates_smj[f].table_1].num_of_records, Unsorted_tables->tables[queries[q].predicates_smj[f].table_2].num_of_records);
-			printf("total merged records %d\n", total);
+			unsorted_tables *temp = malloc(sizeof(unsorted_tables));
+			temp->tables = malloc((queries[q].num_of_tables-1) * sizeof(unsorted_record));
+			for (i=0; i<(queries[q].num_of_tables-1); i++)
+				temp->tables[i].table = malloc(sizeof(unsorted_record) * MAX_RECORDS);
+			for (i=0; i<total; i++) {
+				temp->tables[0].table[i].rowID = result[f].rowID_1[i];
+				temp->tables[1].table[i].rowID = result[f].rowID_2[i];
+			}
+			for (j=2; j<queries[q].num_of_tables; j++) {
+				for (i=0; i<total; i++) {
+					temp->tables[j].table[i].rowID = Unsorted_tables->tables[j].table[i].rowID;
+				}			
+			}
+			Unsorted_tables = temp;
+			for (i=0; i<(queries[q].num_of_tables-1); i++)
+				free(temp->tables[i].table);
+			free(temp->tables);
+			free(temp);
 		}
+	// For Each Sum
+		for (f=0; f<queries[q].num_of_sums; f++) {
+			for (j=0; j<total; j++) {
+				if (queries[q].result_sum[f].table == queries[q].num_of_tables)
+					sum = sum + (database->tables[queries[q].involved_tables[queries[q].result_sum[f].table]].rows[queries[q].result_sum[f].key].value[Unsorted_tables->tables[result[f].rowID_2[j]].table[result[f].rowID_2[j]].rowID]);
+				else
+					sum = sum + (database->tables[queries[q].involved_tables[queries[q].result_sum[f].table]].rows[queries[q].result_sum[f].key].value[Unsorted_tables->tables[result[f].rowID_1[j]].table[result[f].rowID_1[j]].rowID]);
+			}
+			printf("%d ", sum);
+		}
+		printf("\n");
+	// Free Everything
+	
 	}
 }
 // Count the merged result of 1 smj
@@ -296,7 +308,6 @@ uint64_t merge_count (sorted_tables *sorted_tables, uint64_t records_1, uint64_t
 		// If the record from table 1 is equal to the record from table 2
 			} else if (sorted_tables->table_1[position_1].key == sorted_tables->table_2[position_2].key) {
 			// Count the record
-				printf("New Merged Result\n");
 				total++;
 			// If there is a previous record in table 1
 				if (sorted_tables->table_1[position_1].key != prev) {
@@ -364,11 +375,4 @@ void merge (sorted_tables *sorted_tables, merged *result, uint64_t records_1, ui
 	// Keep the key of the record from table 1 so it can be used during the next read
 		prev = sorted_tables->table_1[position_1].key;
 	}
-}
-
-// Print an unsorted table
-void print_unsorted_table (unsorted_tables *Unsorted_tables) {
-	int i = 0;
-	for (i=0; i<Unsorted_tables->tables[1].num_of_records; i++)
-		printf("%d	*%" PRIu64 "	*	%" PRIu64 "\n", i, Unsorted_tables->tables[1].table[i].rowID, Unsorted_tables->tables[1].table[i].key);
 }

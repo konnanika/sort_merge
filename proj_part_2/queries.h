@@ -26,7 +26,6 @@ typedef struct filter {
 typedef struct sum {
 	int table;
 	int key;
-	uint64_t result;
 } sum;
 
 typedef struct query {
