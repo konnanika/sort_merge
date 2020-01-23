@@ -23,7 +23,7 @@ void read_binary_files (input *files, database *database) {
 	uint64_t m = 0;
 	uint64_t j = 0;
 	uint64_t count = 0;
-	uint64_t temp_min = 1000999999999999999999999999;
+	uint64_t temp_min = UINT_MAX;
 	uint64_t temp_max = 0;
 	int *temp_boolean;
 	uint64_t sum_of_distinct = 0;
