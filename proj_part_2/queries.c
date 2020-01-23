@@ -263,6 +263,9 @@ void queries_execution (query *queries, database *database) {
 				free(temp->tables[i].table);
 			free(temp->tables);
 			free(temp);
+			free(Sorted_tables->table_1);
+			free(Sorted_tables->table_2);
+			free(Sorted_tables);
 		}
 	// For Each Sum
 		for (f=0; f<queries[q].num_of_sums; f++) {
@@ -272,11 +275,19 @@ void queries_execution (query *queries, database *database) {
 				else
 					sum = sum + (database->tables[queries[q].involved_tables[queries[q].result_sum[f].table]].rows[queries[q].result_sum[f].key].value[Unsorted_tables->tables[result[f].rowID_1[j]].table[result[f].rowID_1[j]].rowID]);
 			}
-			printf("%d ", sum);
+			printf("%" PRIu64 " ", sum);
 		}
 		printf("\n");
 	// Free Everything
-	
+		for (i=0; i<2; i++)
+			free(Unsorted_tables->tables[i].table);
+		free(Unsorted_tables->tables);
+		free(Unsorted_tables);
+		for (i=0; i<queries[q].num_of_smjs; i++) {
+			free(result[f].rowID_1);
+			free(result[f].rowID_2);
+		}
+		free(result);
 	}
 }
 // Count the merged result of 1 smj
