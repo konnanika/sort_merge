@@ -38,6 +38,7 @@ void* QueryJob(){
 }
 
 int main(int argc, char **argv) {
+    int f = 0;
 	time_t t;
     srand((unsigned)time(&t));
 //mutexes
@@ -58,6 +59,38 @@ int main(int argc, char **argv) {
 // Reading the queries
 	queries_menu(queries);
 	queries_statistics(database, queries);
+// Print all the statistics
+    while (queries[q].num_of_smjs != -1) {
+        for (f=0; f<queries[q].num_of_filters; f++) {
+            printf("I = ");
+            printf("%" PRIu64 "\n", queries[q].predicates_filter[f].I_small);
+            printf("U = ");
+            printf("%" PRIu64 "\n", queries[q].predicates_filter[f].U_big);
+            printf("F = ");
+            printf("%" PRIu64 "\n", queries[q].predicates_filter[f].F_count);
+            printf("D = ");
+            printf("%" PRIu64 "\n", queries[q].predicates_filter[f].D_distinct);
+        }
+        for (f=0; f<queries[q].num_of_smjs; f++) {
+            printf("I_a = ");
+            printf("%" PRIu64 "\n", queries[q].predicates_smj[f].I_small_1);
+            printf("U_a = ");
+            printf("%" PRIu64 "\n", queries[q].predicates_smj[f].U_big_1);
+            printf("F_a = ");
+            printf("%" PRIu64 "\n", queries[q].predicates_smj[f].F_count_1);
+            printf("D_a = ");
+            printf("%" PRIu64 "\n", queries[q].predicates_smj[f].D_distinct_1);
+            printf("I_b = ");
+            printf("%" PRIu64 "\n", queries[q].predicates_smj[f].I_small_2);
+            printf("U_b = ");
+            printf("%" PRIu64 "\n", queries[q].predicates_smj[f].U_big_2);
+            printf("F_b = ");
+            printf("%" PRIu64 "\n", queries[q].predicates_smj[f].F_count_2);
+            printf("D_b = ");
+            printf("%" PRIu64 "\n", queries[q].predicates_smj[f].D_distinct_2);                                         
+        }
+        q++;
+    }
 	while (queries[q].num_of_smjs != -1) {
 		enqueue(&queries_queue,&(queries[q]),q);
 		q++;
