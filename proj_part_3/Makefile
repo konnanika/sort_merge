@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-c
 
 sql: sql.o read.o queue.o queries.o menu.o helpers.o data.o
-	$(CC) -pthread sql.o read.o queue.o queries.o menu.o helpers.o data.o -o smj -lrt
+	$(CC) -pthread sql.o read.o queue.o queries.o menu.o helpers.o data.o -o smj -lrt -lm
 
 read.o: read.c read.h
 	$(CC) $(CFLAGS) read.c

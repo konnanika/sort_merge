@@ -389,3 +389,87 @@ void merge (sorted_tables *sorted_tables, merged *result, uint64_t records_1, ui
 		prev = sorted_tables->table_1[position_1].key;
 	}
 }
+
+void queries_statistics(database *database, query *queries) {
+	int q = 0;
+	int i = 0;
+	int j = 0;
+	int f = 0;
+	uint64_t flag = 0;
+	uint64_t counter = 0;
+	uint64_t x = 0;
+	uint64_t y = 0;
+	uint64_t z = 0;
+	uint64_t w = 0;
+	int has_filter = 0;
+	while (queries[q].num_of_smjs != -1) {
+		for (j=0; j<queries[q].num_of_tables; j++) {
+			has_filter = 0;
+			for (f=0; f<queries[q].num_of_filters; f++) {
+				if (queries[q].involved_tables[j] == queries[q].predicates_filter[f].table) {
+					has_filter = 1;
+					break;
+				}
+			}
+			if (has_filter == 1) {
+				if (queries[q].predicates_filter[f].symbol == '=') {
+					queries[q].predicates_filter[f].I_small = queries[q].predicates_filter[f].number;
+					queries[q].predicates_filter[f].U_big = queries[q].predicates_filter[f].number;
+					flag = 0;
+					counter = 0;
+					for (i=0; i<database->tables[queries[q].involved_tables[j]].lines; i++) {
+						if (database->tables[queries[q].involved_tables[j]].rows[queries[q].predicates_filter[f].key].value[i] == queries[q].predicates_filter[f].number) {
+							flag = 1;
+							counter ++;
+						}
+					}
+					queries[q].predicates_filter[f].D_distinct = flag;
+					queries[q].predicates_filter[f].F_count = counter;
+				} else if (queries[q].predicates_filter[f].symbol == '>') {
+					queries[q].predicates_filter[f].I_small = queries[q].predicates_filter[f].number;
+					queries[q].predicates_filter[f].U_big = database->tables[queries[q].involved_tables[j]].rows[queries[q].predicates_filter[f].key].U_big;
+					queries[q].predicates_filter[f].F_count = ((queries[q].predicates_filter[f].U_big - queries[q].predicates_filter[f].I_small) / (database->tables[queries[q].involved_tables[j]].rows[queries[q].predicates_filter[f].key].U_big - database->tables[queries[q].involved_tables[j]].rows[queries[q].predicates_filter[f].key].I_small)) * database->tables[queries[q].involved_tables[j]].rows[queries[q].predicates_filter[f].key].F_count;
+					queries[q].predicates_filter[f].D_distinct = ((queries[q].predicates_filter[f].U_big - queries[q].predicates_filter[f].I_small) / (database->tables[queries[q].involved_tables[j]].rows[queries[q].predicates_filter[f].key].U_big - database->tables[queries[q].involved_tables[j]].rows[queries[q].predicates_filter[f].key].I_small)) * database->tables[queries[q].involved_tables[j]].rows[queries[q].predicates_filter[f].key].D_distinct;
+				}else if (queries[q].predicates_filter[f].symbol == '<') {
+					queries[q].predicates_filter[f].I_small = database->tables[queries[q].involved_tables[j]].rows[queries[q].predicates_filter[f].key].I_small;
+					queries[q].predicates_filter[f].U_big = queries[q].predicates_filter[f].number;
+					queries[q].predicates_filter[f].F_count = ((queries[q].predicates_filter[f].U_big - queries[q].predicates_filter[f].I_small) / (database->tables[queries[q].involved_tables[j]].rows[queries[q].predicates_filter[f].key].U_big - database->tables[queries[q].involved_tables[j]].rows[queries[q].predicates_filter[f].key].I_small)) * database->tables[queries[q].involved_tables[j]].rows[queries[q].predicates_filter[f].key].F_count;
+					queries[q].predicates_filter[f].D_distinct = ((queries[q].predicates_filter[f].U_big - queries[q].predicates_filter[f].I_small) / (database->tables[queries[q].involved_tables[j]].rows[queries[q].predicates_filter[f].key].U_big - database->tables[queries[q].involved_tables[j]].rows[queries[q].predicates_filter[f].key].I_small)) * database->tables[queries[q].involved_tables[j]].rows[queries[q].predicates_filter[f].key].D_distinct;
+				}
+			}
+		}
+		for (f=0; f<queries[q].num_of_smjs; f++) {
+			if (queries[q].predicates_smj[f].table_1 == queries[q].predicates_smj[f].table_2) {
+				x = database->tables[queries[q].involved_tables[queries[q].predicates_smj[f].table_1]].rows[queries[q].predicates_smj[f].key_1].I_small;
+				y = database->tables[queries[q].involved_tables[queries[q].predicates_smj[f].table_2]].rows[queries[q].predicates_smj[f].key_2].I_small;
+				queries[q].predicates_smj[f].I_small_1 = (x > y) ? x : y;
+				x = database->tables[queries[q].involved_tables[queries[q].predicates_smj[f].table_1]].rows[queries[q].predicates_smj[f].key_1].U_big;
+				y = database->tables[queries[q].involved_tables[queries[q].predicates_smj[f].table_2]].rows[queries[q].predicates_smj[f].key_2].U_big;			
+				queries[q].predicates_smj[f].U_big_1 = (x < y) ? x : y;
+				queries[q].predicates_smj[f].F_count_1 = (database->tables[queries[q].involved_tables[queries[q].predicates_smj[f].table_1]].rows[queries[q].predicates_smj[f].key_1].F_count) / (queries[q].predicates_smj[f].U_big_1 - queries[q].predicates_smj[f].I_small_1 + 1);
+				x = database->tables[queries[q].involved_tables[queries[q].predicates_smj[f].table_1]].rows[queries[q].predicates_smj[f].key_1].D_distinct;
+				y = database->tables[queries[q].involved_tables[queries[q].predicates_smj[f].table_1]].rows[queries[q].predicates_smj[f].key_1].F_count;
+				z = queries[q].predicates_smj[f].F_count_1;
+				queries[q].predicates_smj[f].D_distinct_1 = x * (1 - (pow((1 - (z / y)), (y / x))));
+				queries[q].predicates_smj[f].I_small_2 = queries[q].predicates_smj[f].I_small_1;
+				queries[q].predicates_smj[f].U_big_2 = queries[q].predicates_smj[f].U_big_1;
+				queries[q].predicates_smj[f].F_count_2 = queries[q].predicates_smj[f].F_count_1;
+				queries[q].predicates_smj[f].D_distinct_2 = queries[q].predicates_smj[f].D_distinct_1;
+			} else {
+				x = database->tables[queries[q].involved_tables[queries[q].predicates_smj[f].table_1]].rows[queries[q].predicates_smj[f].key_1].I_small;
+				y = database->tables[queries[q].involved_tables[queries[q].predicates_smj[f].table_2]].rows[queries[q].predicates_smj[f].key_2].I_small;
+				queries[q].predicates_smj[f].I_small_1 = (x > y) ? x : y;
+				x = database->tables[queries[q].involved_tables[queries[q].predicates_smj[f].table_1]].rows[queries[q].predicates_smj[f].key_1].U_big;
+				y = database->tables[queries[q].involved_tables[queries[q].predicates_smj[f].table_2]].rows[queries[q].predicates_smj[f].key_2].U_big;			
+				queries[q].predicates_smj[f].U_big_1 = (x < y) ? x : y;
+				queries[q].predicates_smj[f].F_count_1 = (database->tables[queries[q].involved_tables[queries[q].predicates_smj[f].table_1]].rows[queries[q].predicates_smj[f].key_1].F_count * database->tables[queries[q].involved_tables[queries[q].predicates_smj[f].table_2]].rows[queries[q].predicates_smj[f].key_2].F_count) / (queries[q].predicates_smj[f].U_big_1 - queries[q].predicates_smj[f].I_small_1 + 1);
+				queries[q].predicates_smj[f].D_distinct_1 = (database->tables[queries[q].involved_tables[queries[q].predicates_smj[f].table_1]].rows[queries[q].predicates_smj[f].key_1].D_distinct * database->tables[queries[q].involved_tables[queries[q].predicates_smj[f].table_2]].rows[queries[q].predicates_smj[f].key_2].D_distinct) / (queries[q].predicates_smj[f].U_big_1 - queries[q].predicates_smj[f].I_small_1 + 1);
+				queries[q].predicates_smj[f].I_small_2 = queries[q].predicates_smj[f].I_small_1;
+				queries[q].predicates_smj[f].U_big_2 = queries[q].predicates_smj[f].U_big_1;
+				queries[q].predicates_smj[f].F_count_2 = queries[q].predicates_smj[f].F_count_1;
+				queries[q].predicates_smj[f].D_distinct_2 = queries[q].predicates_smj[f].D_distinct_1;
+			}
+		}
+		q++;
+	}
+}

@@ -57,6 +57,7 @@ int main(int argc, char **argv) {
 	read_binary_files (files, database);
 // Reading the queries
 	queries_menu(queries);
+	queries_statistics(database, queries);
 	while (queries[q].num_of_smjs != -1) {
 		enqueue(&queries_queue,&(queries[q]),q);
 		q++;

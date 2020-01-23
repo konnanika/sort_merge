@@ -127,6 +127,10 @@ void queries_menu (query *queries) {
 				queries[q].predicates_filter[queries[q].num_of_filters].key = atoi(token);
 				token = strtok(NULL,ampersand);
 				queries[q].predicates_filter[queries[q].num_of_filters].number = atoi(token);
+				queries[q].predicates_filter[queries[q].num_of_filters].I_small = 0;
+				queries[q].predicates_filter[queries[q].num_of_filters].U_big = 0;
+				queries[q].predicates_filter[queries[q].num_of_filters].F_count = 0;
+				queries[q].predicates_filter[queries[q].num_of_filters].D_distinct = 0;
 				queries[q].num_of_filters++;
 			} else if (dots == 2) {
 				token = strtok(predicates, dot);
@@ -138,6 +142,14 @@ void queries_menu (query *queries) {
 				token = strtok(NULL, dot);
 				queries[q].predicates_smj[queries[q].num_of_smjs].key_2 = atoi(token);
 				queries[q].num_of_smjs++;
+				queries[q].predicates_smj[queries[q].num_of_smjs].I_small_1 = 0;
+				queries[q].predicates_smj[queries[q].num_of_smjs].U_big_1 = 0;
+				queries[q].predicates_smj[queries[q].num_of_smjs].F_count_1 = 0;
+				queries[q].predicates_smj[queries[q].num_of_smjs].D_distinct_1 = 0;
+				queries[q].predicates_smj[queries[q].num_of_smjs].I_small_2 = 0;
+				queries[q].predicates_smj[queries[q].num_of_smjs].U_big_2 = 0;
+				queries[q].predicates_smj[queries[q].num_of_smjs].F_count_2 = 0;
+				queries[q].predicates_smj[queries[q].num_of_smjs].D_distinct_2 = 0;
 			}
 			chars=0;
 			for (i=0; official_predicates[i]!='\0'; i++) {

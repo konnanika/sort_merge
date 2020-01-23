@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <inttypes.h>
+#include <math.h>
 
 #include "consts.h"
 #include "data.h"
@@ -12,12 +13,16 @@
 typedef struct smj {
 	int table_1;
 	int key_1;
+	uint64_t I_small_1;
+	uint64_t U_big_1;
+	uint64_t F_count_1;
+	uint64_t D_distinct_1;
 	int table_2;
 	int key_2;
-	uint64_t I_small;
-	uint64_t U_big;
-	uint64_t F_count;
-	uint64_t D_distinct;
+	uint64_t I_small_2;
+	uint64_t U_big_2;
+	uint64_t F_count_2;
+	uint64_t D_distinct_2;
 } smj;
 
 typedef struct filter {
@@ -109,6 +114,6 @@ uint64_t merge_count (sorted_tables *sorted_tables, uint64_t records_1, uint64_t
 
 void merge (sorted_tables *sorted_tables, merged *result, uint64_t records_1, uint64_t records_2);
 
-void print_unsorted_table (unsorted_tables *Unsorted_tables);
+void queries_statistics(database *database, query *queries);
 
 #endif
