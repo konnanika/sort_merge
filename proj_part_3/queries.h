@@ -9,6 +9,7 @@
 
 #include "consts.h"
 #include "data.h"
+#include "queue.h"
 
 typedef struct smj {
 	int table_1;
@@ -95,6 +96,8 @@ void init_unsorted_tables (unsorted_tables *unsorted_tables, database *database,
 void init_sorted_tables (sorted_tables *sorted_tables, uint64_t size_1, uint64_t size_2);
 
 void fill_bin_tables (unsorted_tables *Unsorted_tables, int table_1, int table_2);
+
+void* sortjob(struct sort_queuestruct* sortqueue);
 
 void sort (unsorted_record *unsorted_table, sorted_record *sorted_table, int position, int records, int byte);
 

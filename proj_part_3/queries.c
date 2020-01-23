@@ -74,6 +74,40 @@ void fill_bin_tables (unsorted_tables *Unsorted_tables, int table_1, int table_2
 		}
 	}
 }
+void* sortjob(sort_queuestruct* sortqueue){
+	int i;
+	//make newnode
+	sort_node *mynode = malloc(sizeof(sort_node));
+	
+    while(1){
+        pthread_mutex_lock(sortqueue->sort_dequeue_mutex);
+        if (sortqueue->front == NULL && sortqueue->end == NULL){
+        pthread_mutex_unlock(sortqueue->sort_dequeue_mutex);
+            break;
+        }
+        //ininialize newnode and free the node from the queue
+		mynode->hist = sortqueue->end->hist;
+		mynode->hist_pos = sortqueue->end->hist_pos;
+		mynode->unsortedtable = sortqueue->end->unsortedtable;
+		
+        sort_dequeue(sortqueue);
+        pthread_mutex_unlock(sortqueue->sort_dequeue_mutex);
+		for ( i = 0; i < sortqueue->numofrecords; i++)
+		{
+			if (mynode->unsortedtable[i].bin[sortqueue->byte] - mynode->hist_pos == 0)
+			{
+				mynode->hist[mynode->hist_pos].temp_table[mynode->hist[mynode->hist_pos].value] = mynode->unsortedtable[i];
+				mynode->hist[mynode->hist_pos].value ++;
+			}
+			
+		}
+		
+    }
+	free(mynode);
+    printf("sortjob: peace out\n");
+    pthread_exit(NULL);
+    return NULL;
+}
 // Read an unsorted table and sort them in the same table recursively
 void sort (unsorted_record *unsorted_table, sorted_record *sorted_table, int position, int records, int byte) {
 // Variables
@@ -85,18 +119,37 @@ void sort (unsorted_record *unsorted_table, sorted_record *sorted_table, int pos
 // Temporary Database Variables
 	histogram *hist = malloc(sizeof(histogram)*256);;
 	init_histogram (hist);
+	
+// create the queue for sorjobs
+pthread_mutex_t sort_dequeue_mutex;
+pthread_mutex_init(&sort_dequeue_mutex,NULL);
+sort_queuestruct sort_queue;
+sort_queue.end=NULL;
+sort_queue.front=NULL;
+sort_queue.byte = byte;
+sort_queue.numofrecords = records;
+sort_queue.sort_dequeue_mutex = &sort_dequeue_mutex;
+//fill the queue with jobs
+	for (j=0; j<256; j++) {
+		sort_node *newnode = malloc(sizeof(sort_node));
+		newnode->hist = hist;
+		newnode->hist_pos = j;
+		newnode->unsortedtable = unsorted_table;
+		sort_enqueue(&sort_queue,*newnode);
+	}
+//create threadpool
+pthread_t threadPool[NUMOF_SORT_THREADS];
+	for(i=0; i<NUMOF_SORT_THREADS; i++) {
+        pthread_create(&threadPool[i], NULL, sortjob, &sort_queue);
+    }
+//wait for all threads
+    for(i=0; i<NUMOF_SORT_THREADS; i++) {
+        //printf("sort: waiting for %d querries to finish.\n",NUMOF_QUERY_THREADS-i);
+        pthread_join(threadPool[i], NULL);
+    }
+// Fill the psum
 	int psum[256];
 	init_psum (psum);
-// Read the unsorted table and fill the histogram
-	for (j=0; j<256; j++) {
-		for (i=0; i<records; i++) {
-			if (unsorted_table[i].bin[byte] - j == 0) {
-				hist[j].temp_table[hist[j].value] = unsorted_table[i];
-				hist[j].value++;
-			}
-		}
-	}
-// Fill the psum
 	i = 0;
 	for (j=0; j<256; j++) {
 		psum[j] = i;
