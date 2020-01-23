@@ -11,5 +11,7 @@
 #include "menu.h"
 
 void read_binary_files (input *files, database *database);
+void init_table (int table[MAX_NUM_OF_BOOLEAN]);
+void init_row(row *row);
 
 #endif

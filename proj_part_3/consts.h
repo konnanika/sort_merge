@@ -17,6 +17,7 @@
 #define MAX_NUM_OF_SMJS								100
 #define MAX_NUM_OF_SUMS								100
 #define STRING_LENGTH								100
+#define MAX_NUM_OF_BOOLEAN							50000000
 
 #define tesrelA										3				// Number of lines in first unit test file
 #define tesrelB										2				// Number of lines in second unit test file

@@ -10,6 +10,10 @@
 
 typedef struct row {
 	uint64_t *value;
+	uint64_t I_small;
+	uint64_t U_big;
+	uint64_t F_count;
+	uint64_t D_distinct;
 } row;
 
 typedef struct table {

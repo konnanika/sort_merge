@@ -14,6 +14,10 @@ typedef struct smj {
 	int key_1;
 	int table_2;
 	int key_2;
+	uint64_t I_small;
+	uint64_t U_big;
+	uint64_t F_count;
+	uint64_t D_distinct;
 } smj;
 
 typedef struct filter {
@@ -21,6 +25,10 @@ typedef struct filter {
 	int key;
 	char symbol;
 	uint64_t number;
+	uint64_t I_small;
+	uint64_t U_big;
+	uint64_t F_count;
+	uint64_t D_distinct;
 } filter;
 
 typedef struct sum {
