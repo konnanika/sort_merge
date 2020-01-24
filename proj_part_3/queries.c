@@ -105,6 +105,10 @@ void* sortjob(sort_queuestruct* sortqueue){
     }
 	free(mynode);
     printf("sortjob: peace out\n");
+<<<<<<< HEAD
+=======
+    pthread_exit(NULL);
+>>>>>>> 1ad837a6fef6dec40a5328e239ad52226f541b7a
     return NULL;
 }
 // Read an unsorted table and sort them in the same table recursively
