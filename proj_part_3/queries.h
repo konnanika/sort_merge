@@ -9,6 +9,7 @@
 
 #include "consts.h"
 #include "data.h"
+#include "queue.h"
 
 typedef struct smj {
 	int table_1;
@@ -90,11 +91,23 @@ typedef struct merged {
 	uint64_t *rowID_2; // always to database
 } merged;
 
+typedef struct merge_count_info
+{
+	struct sorted_tables* sorted_tables;
+	uint64_t records_1;
+	uint64_t records_2;
+	int start;	//where will the thread start
+	int id;		//where will it save the count (array cell)
+	int * counts;
+}merge_count_info;
+
 void init_unsorted_tables (unsorted_tables *unsorted_tables, database *database, query *queries, int q);
 
 void init_sorted_tables (sorted_tables *sorted_tables, uint64_t size_1, uint64_t size_2);
 
 void fill_bin_tables (unsorted_tables *Unsorted_tables, int table_1, int table_2);
+
+void* sortjob(struct sort_queuestruct* sortqueue);
 
 void sort (unsorted_record *unsorted_table, sorted_record *sorted_table, int position, int records, int byte);
 
@@ -110,7 +123,7 @@ void free_queries (query *queries);
 
 void queries_execution (query *queries, database *database);
 
-uint64_t merge_count (sorted_tables *sorted_tables, uint64_t records_1, uint64_t records_2);
+void* mergecountjob(merge_count_info* mergecountinfo);
 
 void merge (sorted_tables *sorted_tables, merged *result, uint64_t records_1, uint64_t records_2);
 

@@ -63,6 +63,60 @@ void printqueue( queuestruct* queries){
         a = a->next;
     }
 }
+
+int sort_isempty(sort_queuestruct* sortstruct){
+    if (sortstruct->front == NULL && sortstruct->end == NULL)
+    {
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+void sort_enqueue(sort_queuestruct* sortstruct, sort_node data){
+   
+    if (sortstruct->front == NULL && sortstruct->end == NULL){
+        data.next = sortstruct->front;
+        sortstruct->front = &data; 
+        sortstruct->end = &data;   
+    }
+    else{
+        data.next = sortstruct->front;
+        sortstruct->front = &data; 
+    } 
+}
+void sort_dequeue(struct sort_queuestruct* sortstruct){
+    if (sort_isempty(sortstruct) == 1)
+    {
+        return;
+    }
+    
+    sort_node* a = sortstruct->front;
+    if (a == sortstruct->end){
+        free (a);
+        sortstruct->front = NULL;
+        sortstruct->end = NULL;
+    return;
+    }
+    while (a->next != sortstruct->end){
+        a = a->next;
+    }
+    free(sortstruct->end);
+    sortstruct->end = a;
+    sortstruct->end->next = NULL;
+}
+void sort_printqueue( sort_queuestruct* sortstruct){
+    if (sort_isempty(sortstruct)==1)
+    {
+    printf("queue empty cant print\n");
+    return;        
+    }
+    sort_node* a = sortstruct->front;
+    while (a!=NULL)
+    {   printf("Hist pos: %d\n",a->hist_pos);
+        a = a->next;
+    }
+}
 /*void* QueryJob(){
     //take query
     query* q = malloc(sizeof(query));

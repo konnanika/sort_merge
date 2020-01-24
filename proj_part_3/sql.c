@@ -24,15 +24,17 @@ void* QueryJob(){
         pthread_mutex_unlock(&dequeue_mutex);
 
         sleep(rand()%10);
-        results[id] = rand()%25;
-    }
-	/*
+        /*
     edw ektelesi tou query me orisma to q
     void init_unsorted_tables (unsorted_tables *unsorted_tables, database *database, query *queries, int q);
     void init_sorted_tables (sorted_tables *sorted_tables, uint64_t size_1, uint64_t size_2);
     sort (unsorted_record *unsorted_table, sorted_record *sorted_table, int position, int records, 7) {
-    */ 
-    printf("peace out\n");
+    */
+        results[id] = rand()%25;
+
+    }
+	 
+    printf("querry job:peace out\n");
     pthread_exit(NULL);
     return NULL;
 }

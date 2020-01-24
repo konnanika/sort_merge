@@ -10,7 +10,7 @@ read.o: read.c read.h
 queue.o: queue.c queue.h queries.h
 	$(CC) $(CFLAGS) queue.c
 
-queries.o: queries.c queries.h
+queries.o: queries.c queries.h queue.h
 	$(CC) $(CFLAGS) queries.c
 
 menu.o: menu.c menu.h

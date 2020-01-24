@@ -74,6 +74,39 @@ void fill_bin_tables (unsorted_tables *Unsorted_tables, int table_1, int table_2
 		}
 	}
 }
+void* sortjob(sort_queuestruct* sortqueue){
+	int i;
+	//make newnode
+	sort_node *mynode = malloc(sizeof(sort_node));
+	
+    while(1){
+        pthread_mutex_lock(sortqueue->sort_dequeue_mutex);
+        if (sortqueue->front == NULL && sortqueue->end == NULL){
+        pthread_mutex_unlock(sortqueue->sort_dequeue_mutex);
+            break;
+        }
+        //ininialize newnode and free the node from the queue
+		mynode->hist = sortqueue->end->hist;
+		mynode->hist_pos = sortqueue->end->hist_pos;
+		mynode->unsortedtable = sortqueue->end->unsortedtable;
+		
+        sort_dequeue(sortqueue);
+        pthread_mutex_unlock(sortqueue->sort_dequeue_mutex);
+		for ( i = 0; i < sortqueue->numofrecords; i++)
+		{
+			if (mynode->unsortedtable[i].bin[sortqueue->byte] - mynode->hist_pos == 0)
+			{
+				mynode->hist[mynode->hist_pos].temp_table[mynode->hist[mynode->hist_pos].value] = mynode->unsortedtable[i];
+				mynode->hist[mynode->hist_pos].value ++;
+			}
+			
+		}
+		
+    }
+	free(mynode);
+    printf("sortjob: peace out\n");
+    return NULL;
+}
 // Read an unsorted table and sort them in the same table recursively
 void sort (unsorted_record *unsorted_table, sorted_record *sorted_table, int position, int records, int byte) {
 // Variables
@@ -85,18 +118,37 @@ void sort (unsorted_record *unsorted_table, sorted_record *sorted_table, int pos
 // Temporary Database Variables
 	histogram *hist = malloc(sizeof(histogram)*256);;
 	init_histogram (hist);
+	
+// create the queue for sorjobs
+pthread_mutex_t sort_dequeue_mutex;
+pthread_mutex_init(&sort_dequeue_mutex,NULL);
+sort_queuestruct sort_queue;
+sort_queue.end=NULL;
+sort_queue.front=NULL;
+sort_queue.byte = byte;
+sort_queue.numofrecords = records;
+sort_queue.sort_dequeue_mutex = &sort_dequeue_mutex;
+//fill the queue with jobs
+	for (j=0; j<256; j++) {
+		sort_node *newnode = malloc(sizeof(sort_node));
+		newnode->hist = hist;
+		newnode->hist_pos = j;
+		newnode->unsortedtable = unsorted_table;
+		sort_enqueue(&sort_queue,*newnode);
+	}
+//create threadpool
+pthread_t threadPool[NUMOF_SORT_THREADS];
+	for(i=0; i<NUMOF_SORT_THREADS; i++) {
+        pthread_create(&threadPool[i], NULL, sortjob, &sort_queue);
+    }
+//wait for all threads
+    for(i=0; i<NUMOF_SORT_THREADS; i++) {
+        //printf("sort: waiting for %d querries to finish.\n",NUMOF_QUERY_THREADS-i);
+        pthread_join(threadPool[i], NULL);
+    }
+// Fill the psum
 	int psum[256];
 	init_psum (psum);
-// Read the unsorted table and fill the histogram
-	for (j=0; j<256; j++) {
-		for (i=0; i<records; i++) {
-			if (unsorted_table[i].bin[byte] - j == 0) {
-				hist[j].temp_table[hist[j].value] = unsorted_table[i];
-				hist[j].value++;
-			}
-		}
-	}
-// Fill the psum
 	i = 0;
 	for (j=0; j<256; j++) {
 		psum[j] = i;
@@ -242,9 +294,43 @@ void queries_execution (query *queries, database *database) {
 			fill_bin_tables (Unsorted_tables, queries[q].predicates_smj[f].table_1, queries[q].predicates_smj[f].table_2);
 			sort (Unsorted_tables->tables[queries[q].predicates_smj[f].table_1].table, Sorted_tables->table_1, 0, Unsorted_tables->tables[queries[q].predicates_smj[f].table_1].num_of_records, 7);
 			sort (Unsorted_tables->tables[queries[q].predicates_smj[f].table_2].table, Sorted_tables->table_2, 0, Unsorted_tables->tables[queries[q].predicates_smj[f].table_2].num_of_records, 7);
-			total = merge_count (Sorted_tables, Unsorted_tables->tables[queries[q].predicates_smj[f].table_1].num_of_records, Unsorted_tables->tables[queries[q].predicates_smj[f].table_2].num_of_records);
+		//merge count multithreading
+			int *counts = malloc(NUMOF_MERGE_THREADS*sizeof(int));//result of counts table
+			merge_count_info* mergecountinfo = malloc(NUMOF_MERGE_THREADS*sizeof(merge_count_info));
+			int records_split = (Unsorted_tables->tables[queries[q].predicates_smj[f].table_1].num_of_records)/NUMOF_MERGE_THREADS;
+			for (i = 0; i < NUMOF_MERGE_THREADS; i++)
+			{
+				mergecountinfo[i].sorted_tables = Sorted_tables;
+				mergecountinfo[i].records_1 = records_split;
+				mergecountinfo[i].records_2 = Unsorted_tables->tables[queries[q].predicates_smj[f].table_2].num_of_records;
+				mergecountinfo[i].start = i*records_split;
+				mergecountinfo[i].id = i;
+				mergecountinfo[i].counts = counts;
+			}
+			
+			
+			for (i = 0; i < (Unsorted_tables->tables[queries[q].predicates_smj[f].table_1].num_of_records)%NUMOF_MERGE_THREADS; i++)
+			{
+			mergecountinfo[i].records_1 ++;
+			mergecountinfo[i].start += i;
+			}
+			//create threadpool
+			pthread_t threadPool[NUMOF_MERGE_THREADS];
+			for(i=0; i<NUMOF_MERGE_THREADS; i++) {
+        		pthread_create(&threadPool[i], NULL, mergecountjob, &(mergecountinfo[i]));
+    		}
+			//wait for all threads
+			for(i=0; i<NUMOF_MERGE_THREADS; i++) {
+				pthread_join(threadPool[i], NULL);
+			}
+			for(i=0; i<NUMOF_MERGE_THREADS; i++) {
+				total += counts[i];
+			}
+			
 			result[f].rowID_1 = malloc(total * sizeof(uint64_t));
 			result[f].rowID_2 = malloc(total * sizeof(uint64_t));
+			
+			
 			merge (Sorted_tables, result, Unsorted_tables->tables[queries[q].predicates_smj[f].table_1].num_of_records, Unsorted_tables->tables[queries[q].predicates_smj[f].table_2].num_of_records);
 			unsorted_tables *temp = malloc(sizeof(unsorted_tables));
 			temp->tables = malloc((queries[q].num_of_tables-1) * sizeof(unsorted_record));
@@ -292,42 +378,41 @@ void queries_execution (query *queries, database *database) {
 	}
 }
 // Count the merged result of 1 smj
-uint64_t merge_count (sorted_tables *sorted_tables, uint64_t records_1, uint64_t records_2) {
+void* mergecountjob(merge_count_info* mergecountinfo){
 // Variables
-	int position_1 = 0;
+	int position_1 = mergecountinfo->start;
 	int position_2 = 0;
 	int position_2_first = 0;
 	int position_2_last = 0;
 	int i = 0;
 	uint64_t prev = -1;
-	uint64_t total = 0;
 // Read 1 record from the sorted table 1 from start to finish
-	for (position_1=0; position_1<records_1; position_1++) {
+	for (position_1=mergecountinfo->start; position_1<mergecountinfo->records_1+mergecountinfo->start; position_1++) {
 	// Read 1 record from the sorted table 2 from first to last
 		for (position_2=position_2_first; position_2<=position_2_last; position_2++) {
 		// If the record from table 1 is higher from the record from table 2
-			if (sorted_tables->table_1[position_1].key > sorted_tables->table_2[position_2].key) {
+			if (mergecountinfo->sorted_tables->table_1[position_1].key > mergecountinfo->sorted_tables->table_2[position_2].key) {
 			// Read the next of last in table 2
-				if (position_2_last < records_2 - 1) {
+				if (position_2_last < mergecountinfo->records_2 - 1) {
 					position_2 = position_2_last;
 					position_2_last++;
 					position_2_first = position_2_last;
 				}
 		// If the record from table 1 is lower from the record from table 2
-			} else if (sorted_tables->table_1[position_1].key < sorted_tables->table_2[position_2].key) {
+			} else if (mergecountinfo->sorted_tables->table_1[position_1].key < mergecountinfo->sorted_tables->table_2[position_2].key) {
 			// Read the next in table 1
 				break;
 		// If the record from table 1 is equal to the record from table 2
-			} else if (sorted_tables->table_1[position_1].key == sorted_tables->table_2[position_2].key) {
+			} else if (mergecountinfo->sorted_tables->table_1[position_1].key == mergecountinfo->sorted_tables->table_2[position_2].key) {
 			// Count the record
 				printf("New Merged Result\n");
-				total++;
+				mergecountinfo->counts[mergecountinfo->id] ++;
 			// If there is a previous record in table 1
-				if (sorted_tables->table_1[position_1].key != prev) {
+				if (mergecountinfo->sorted_tables->table_1[position_1].key != prev) {
 				// If the table 2 is not finished
-					if (position_2_last < records_2 - 1) {
+					if (position_2_last < mergecountinfo->records_2 - 1) {
 					// If the next in table 2 is equal to the one we compare at the moment
-						if (sorted_tables->table_2[position_2].key == sorted_tables->table_2[position_2 + 1].key) {
+						if (mergecountinfo->sorted_tables->table_2[position_2].key == mergecountinfo->sorted_tables->table_2[position_2 + 1].key) {
 						// Move the last to the next record
 							position_2_last++;
 						}
@@ -336,10 +421,11 @@ uint64_t merge_count (sorted_tables *sorted_tables, uint64_t records_1, uint64_t
 			}
 		}
 	// Keep the key of the record from table 1 so it can be used during the next read
-		prev = sorted_tables->table_1[position_1].key;
+		prev = mergecountinfo->sorted_tables->table_1[position_1].key;
 	}
-// When its all done return total records
-	return total;
+// exit
+    pthread_exit(NULL);
+	return NULL;
 }
 // Merge 2 sorted tables and save the records to the buffer list
 void merge (sorted_tables *sorted_tables, merged *result, uint64_t records_1, uint64_t records_2) {
